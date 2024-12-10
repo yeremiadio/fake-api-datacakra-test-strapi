@@ -19,9 +19,6 @@ export default factories.createCoreController('api::plant.plant', ({ strapi }) =
             ctx.request.body.data = {};
         }
 
-        // Add the user ID to the request body
-        ctx.request.body.data.user = user.id;
-
         // Call the default core create method with the updated request body
         const response = await super.create(ctx);
         return response;
@@ -34,16 +31,6 @@ export default factories.createCoreController('api::plant.plant', ({ strapi }) =
         // Check if the user is authenticated
         if (!user) {
             return ctx.unauthorized('You must be logged in to update this plant.');
-        }
-        // Fetch the plant to check ownership
-        const { id } = ctx.params;
-        const plant = await strapi.db.query('api::plant.plant').findOne({
-            where: { documentId: id },
-            populate: { user: true },
-        });
-        // Check if the authenticated user is the creator of the plant
-        if (plant?.user?.id !== user.id) {
-            return ctx.forbidden('You are not allowed to update this plant.');
         }
 
         // Proceed with the update
